@@ -1,0 +1,13 @@
+{
+  "name": "master-city-project",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "app-governance",
+    "app-traffic"
+  ],
+  "scripts": {
+    "vibe-check": "node scripts/vibe-check.js"
+  }
+}
