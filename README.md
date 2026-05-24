@@ -194,7 +194,7 @@ Main collections:
 
 <img src="app-governance/assets/screenshots/citizen-dashboard.jpeg" width="150"/>
 
-## Download Report Screen
+## Download Report 
 <img src="app-governance/assets/screenshots/commisioner-dashboard.jpeg" width="150"/>
 
 
