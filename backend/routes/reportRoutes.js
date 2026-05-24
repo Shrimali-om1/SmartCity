@@ -57,6 +57,10 @@ router.post('/create', protect, async (req, res) => {
         res.status(201).json(newReport);
     } catch (error) {
         console.error("DETAILED BACKEND ERROR:", error);
+        // If Gemini is overloaded, give a friendlier error or fail open. For now, friendly error.
+        if (error.status === 503) {
+            return res.status(503).json({ message: "AI Verification service is currently busy. Please try again in a few moments." });
+        }
         res.status(500).json({ message: "Internal Server Error", details: error.message });
     }
 });
@@ -320,7 +324,9 @@ router.post('/complete/:id', protect, async (req, res) => {
                     });
                 }
             } catch (error) {
-                res.status(500).json({ message: 'Server Error', error: error.message });
+                console.error("AI Validation Error in /complete:", error.message);
+                // Fail open: if Gemini is overloaded, we still allow the contractor to submit.
+                // Alternatively, we could return a 503 error, but failing open prevents the contractor from being blocked.
             }
         }
         const slaHours = 72; // You can adjust this based on report.category later

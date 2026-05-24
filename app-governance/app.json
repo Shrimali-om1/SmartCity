@@ -13,6 +13,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.smartcity.appgovernance",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -45,6 +47,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4ed457da-66e6-4ca6-aa25-b670a27b6d36"
+      }
     }
   }
 }

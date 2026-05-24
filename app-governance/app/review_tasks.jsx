@@ -154,10 +154,33 @@ function RejectModal({ visible, onClose, onConfirm, reportTitle }) {
     );
 }
 
+// ─── Full Image Modal ─────────────────────────────────────────────────────────
+function FullImageModal({ visible, imageUrl, onClose }) {
+    if (!imageUrl) return null;
+    return (
+        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center' }}>
+                <TouchableOpacity 
+                    onPress={onClose}
+                    style={{ position: 'absolute', top: Platform.OS === 'ios' ? 50 : 30, right: 20, zIndex: 10, padding: 10 }}
+                >
+                    <XCircle color="white" size={32} />
+                </TouchableOpacity>
+                <Image
+                    source={{ uri: imageUrl }}
+                    style={{ width: '100%', height: '80%' }}
+                    contentFit="contain"
+                />
+            </View>
+        </Modal>
+    );
+}
+
 // ─── Report Card ──────────────────────────────────────────────────────────────
 function ReportCard({ report, onApprove, onReject }) {
     const [expanded, setExpanded] = useState(false);
     const [approving, setApproving] = useState(false);
+    const [fullImageVisible, setFullImageVisible] = useState(false);
 
     const isHighPriority = report.isLate;
 
@@ -184,11 +207,13 @@ function ReportCard({ report, onApprove, onReject }) {
             {/* After Image Hero */}
             {report.afterImage && (
                 <View style={{ position: 'relative' }}>
-                    <Image
-                        source={{ uri: report.afterImage }}
-                        style={{ width: '100%', height: 180 }}
-                        contentFit="cover"
-                    />
+                    <TouchableOpacity activeOpacity={0.8} onPress={() => setFullImageVisible(true)}>
+                        <Image
+                            source={{ uri: report.afterImage }}
+                            style={{ width: '100%', height: 180 }}
+                            contentFit="cover"
+                        />
+                    </TouchableOpacity>
                     <View style={{
                         position: 'absolute', top: 12, right: 12,
                         backgroundColor: 'rgba(0,0,0,0.5)',
@@ -351,6 +376,13 @@ function ReportCard({ report, onApprove, onReject }) {
                     </TouchableOpacity>
                 </View>
             </View>
+
+            {/* Full Image Modal */}
+            <FullImageModal 
+                visible={fullImageVisible} 
+                imageUrl={report.afterImage} 
+                onClose={() => setFullImageVisible(false)} 
+            />
         </View>
     );
 }

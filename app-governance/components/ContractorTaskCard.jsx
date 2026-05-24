@@ -37,8 +37,7 @@ async function pickImage() {
                     }
                     result = await ImagePicker.launchCameraAsync({
                         mediaTypes: ['images'],
-                        allowsEditing: true,
-                        aspect: [4, 3],
+                        allowsEditing: false,
                         quality: 0.6,
                     });
                 } else {
@@ -49,13 +48,12 @@ async function pickImage() {
                     }
                     result = await ImagePicker.launchImageLibraryAsync({
                         mediaTypes: ['images'],
-                        allowsEditing: true,
-                        aspect: [4, 3],
+                        allowsEditing: false,
                         quality: 0.6,
                     });
                 }
                 if (!result.canceled && result.assets?.length > 0) {
-                    resolve(result.assets[0].uri);
+                    resolve(result.assets[0]);
                 } else {
                     resolve(null);
                 }
@@ -97,7 +95,7 @@ async function pickImage() {
 // ─── Status config ────────────────────────────────────────────────────────────
 function getStatusConfig(distance) {
     if (distance === null) return { label: 'Calculating…', color: '#94a3b8', dot: '#94a3b8', bg: '#f1f5f9' };
-    if (distance <= 50) return { label: `Within Range (${Math.round(distance)}m)`, color: '#16a34a', dot: '#22c55e', bg: '#f0fdf4' };
+    if (distance <= 100) return { label: `Within Range (${Math.round(distance)}m)`, color: '#16a34a', dot: '#22c55e', bg: '#f0fdf4' };
     return { label: `${Math.round(distance)}m away`, color: '#d97706', dot: '#f59e0b', bg: '#fffbeb' };
 }
 
@@ -153,24 +151,28 @@ export default function ContractorTaskCard({ task, onRefresh, accentColor = '#2d
     };
 
     const handleMarkResolved = async () => {
-        if (distance === null || distance > 50) {
-            Alert.alert('Too Far Away', `You must be within 50 meters of the task location to mark it as resolved.\n\nCurrent distance: ${distance ? Math.round(distance) + 'm' : 'unknown'}`);
+        if (distance === null || distance > 100) {
+            Alert.alert('Too Far Away', `You must be within 100 meters of the task location to mark it as resolved.\n\nCurrent distance: ${distance ? Math.round(distance) + 'm' : 'unknown'}`);
             return;
         }
 
         // Show Camera / Gallery picker
-        const uri = await pickImage();
-        if (!uri) return; // user cancelled
+        const asset = await pickImage();
+        if (!asset) return; // user cancelled
 
-        uploadPhoto(uri);
+        uploadPhoto(asset);
     };
 
-    const uploadPhoto = async (uri) => {
+    const uploadPhoto = async (asset) => {
         setUploading(true);
         try {
-            const filename = uri.split('/').pop();
-            const match = /\.(\w+)$/.exec(filename);
-            const type = match ? `image/${match[1]}` : 'image/jpeg';
+            const uri = asset.uri;
+            let filename = asset.fileName || uri.split('/').pop();
+            if (!filename.includes('.')) {
+                filename += '.jpg';
+            }
+            
+            const type = asset.mimeType || 'image/jpeg';
 
             const formData = new FormData();
             formData.append('image', { uri, name: filename, type });
@@ -194,7 +196,7 @@ export default function ContractorTaskCard({ task, onRefresh, accentColor = '#2d
         }
     };
 
-    const isDisabled = distance === null || distance > 50 || uploading;
+    const isDisabled = distance === null || distance > 100 || uploading;
     const statusCfg  = getStatusConfig(distance);
     const catStyle   = getCategoryStyle(task.category);
 
@@ -225,7 +227,7 @@ export default function ContractorTaskCard({ task, onRefresh, accentColor = '#2d
                 <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: statusCfg.bg, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 }}>
                     <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: statusCfg.dot, marginRight: 6 }} />
                     <Text style={{ color: statusCfg.color, fontSize: 9, fontWeight: '900', letterSpacing: 1 }}>
-                        {distance === null ? 'LOCATING' : distance <= 50 ? 'WITHIN RANGE' : 'OUT OF RANGE'}
+                        {distance === null ? 'LOCATING' : distance <= 100 ? 'WITHIN RANGE' : 'OUT OF RANGE'}
                     </Text>
                 </View>
             </View>

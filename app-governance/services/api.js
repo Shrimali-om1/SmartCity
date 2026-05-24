@@ -1,11 +1,35 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 import { router } from 'expo-router';
+import { Platform } from 'react-native';
 
-// Replace the IP below with your local machine's IP (e.g. 10.245.215.33)
-// and ensure the backend is running on 8080.
+function getBaseURL() {
+    if (process.env.EXPO_PUBLIC_API_URL) {
+        return process.env.EXPO_PUBLIC_API_URL;
+    }
+
+    // Reuse the same LAN host Expo uses for Metro (works on physical devices).
+    const hostUri =
+        Constants.expoConfig?.hostUri ??
+        Constants.expoGoConfig?.debuggerHost ??
+        Constants.manifest?.debuggerHost;
+
+    if (hostUri) {
+        const host = hostUri.split(':')[0];
+        return `http://${host}:8080/api`;
+    }
+
+    // Android emulator maps 10.0.2.2 to the dev machine.
+    if (Platform.OS === 'android') {
+        return 'http://10.0.2.2:8080/api';
+    }
+
+    return 'http://localhost:8080/api';
+}
+
 const API = axios.create({
-    baseURL: 'http://10.122.90.33:8080/api',
+    baseURL: getBaseURL(),
 });
 
 // ── Request interceptor: attach JWT token to every request ───────────────────

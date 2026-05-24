@@ -1,20 +1,34 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator, Platform, StatusBar } from 'react-native';
 import { Menu, Bell, CheckCircle, Info, AlertTriangle, ArrowDown, Award, LayoutGrid, FileText, User as UserIcon } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../services/api';
 
 export default function NotificationsScreen() {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const intervalRef = useRef(null);
 
     const fetchNotifications = async () => {
         try {
+            // Guard: don't attempt if there's no token stored
+            const token = await AsyncStorage.getItem('token');
+            if (!token) {
+                setLoading(false);
+                router.replace('/');
+                return;
+            }
+
             setLoading(true);
             const response = await API.get('/notifications');
             setNotifications(response.data);
         } catch (error) {
-            console.error('Error fetching notifications:', error);
+            // 401 is already handled by the API interceptor (clears token + redirects)
+            // Just stop loading to avoid a stuck spinner
+            if (error.response?.status !== 401) {
+                console.error('Error fetching notifications:', error);
+            }
         } finally {
             setLoading(false);
         }
@@ -30,7 +44,9 @@ export default function NotificationsScreen() {
                     try {
                         await API.put('/notifications/mark-all-read');
                     } catch (err) {
-                        console.error('Failed to mark all as read', err);
+                        if (err.response?.status !== 401) {
+                            console.error('Failed to mark all as read', err);
+                        }
                     }
                 }
             };
@@ -42,10 +58,16 @@ export default function NotificationsScreen() {
     );
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
+        intervalRef.current = setInterval(async () => {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) {
+                // Stop polling if user is no longer authenticated
+                clearInterval(intervalRef.current);
+                return;
+            }
             fetchNotifications();
         }, 10000);
-        return () => clearInterval(intervalId);
+        return () => clearInterval(intervalRef.current);
     }, []);
 
     const parseNotification = (notif) => {
