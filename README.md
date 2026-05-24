@@ -192,21 +192,21 @@ Main collections:
 
 ## Citizen Dashboard
 
-![Citizen Dashboard](app-governance/assets/screenshots/citizen-dashboard.jpeg)
+<img src="app-governance/assets/screenshots/citizen-dashboard.jpeg" width="150"/>
 
-## Create Report Screen
+## Download Report Screen
+<img src="app-governance/assets/screenshots/commisioner-dashboard.jpeg" width="150"/>
 
-![Citizen Dashboard](app-governance/assets/screenshots/report-screen.jpeg)
-![Citizen Dashboard](app-governance/assets/screenshots/report-screen1.jpeg)
+
+
 ## Officer Dashboard
 
-![Citizen Dashboard](app-governance/assets/screenshots/officer-dashboard.jpeg)
-![Citizen Dashboard](app-governance/assets/screenshots/officer-dashboard1.jpeg)
-
+<img src="app-governance/assets/screenshots/officer-dashboard.jpeg" width="150"/>
+<img src="app-governance/assets/screenshots/officer-dashboard1.jpeg" width="150"/>
 
 ## Commissioner Analytics
-
-![Citizen Dashboard](app-governance/assets/screenshots/commisioner-dashboard.jpeg)
+<img src="app-governance/assets/screenshots/report-screen.jpeg" width="150"/>
+<img src="app-governance/assets/screenshots/report-screen1.jpeg" width="150"/>
 
 ---
 
